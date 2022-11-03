@@ -1,31 +1,210 @@
 <!DOCTYPE html>
 <html>
+  <head>
+    <link href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900|Material+Icons" rel="stylesheet" type="text/css">
+    <link href="https://cdn.jsdelivr.net/npm/quasar@2.10.0/dist/quasar.prod.css" rel="stylesheet" type="text/css">
+  </head>
 
-<body>
+  <body>
+    <div id="app" class="q-pa-lg" style="max-width: 600px; margin: 0 auto;">
+      <label>
+        Classification
+      </label>
+      <div class="q-gutter-x-sm q-ml-sm q-mb-lg">
+        <q-radio v-model="form.classification" val="employee" label="Employee" />
+        <q-radio v-model="form.classification" val="contractor" label="Contractor" /> 
+      </div>
 
-<div id="app">
-  {{ message }}
+      <!-- start year -->
+      <label class='q-mb-lg'>
+        Started with company
+      </label>
+      <div class='row q-col-gutter-x-md q-ml-sm q-mb-lg'>
+        <div v-for="input in startInputs"
+          :key="input.key"
+          class='col-3'
+        >
+          <q-input
+            type="number"
+            v-model.number="form[input.key]"
+            :hint="input.label"
+            :step="input.step || 1"
+            :min="input.min"
+            :max="input.max"
+            :rules="inputRules(input)"
+            dense
+            outlined
+          />
+          </q-input>
+        </div>
+      </div>
 
-  <div>
-    <button @click="count++" >
-      more
-    </button>
-    {{ count }}
-  </div>
-</div>
+      <!-- public + private -->
+      <div
+        v-for="input in [...publicInputs, ...privateInputs]"
+        :key="input.key"
+      >
+        <label>
+          {{ input.label }}
+        </label>
+        <div class="row q-col-gutter-x-lg q-ml-xs q-mb-sm">
+          <q-slider
+            v-model="form[input.key]"
+            :color="input.color"
+            markers
+            :marker-labels="markerLabels(input)"
+            :min="input.min"
+            :max="input.max"
+            :step="input.step || 1"
+            class="col-10"
+          >
+          </q-slider>
 
-<script type="module">
-  import { createApp } from 'https://unpkg.com/vue@3/dist/vue.esm-browser.js'
+          <q-input
+            type="number"
+            v-model.number="form[input.key]"
+            :step="input.step || 1"
+            :min="input.min"
+            :max="input.max"
+            :rules="inputRules(input)"
+            outlined
+            dense
+            class="col-2"
+          />
+          </q-input>
+        </div>
+      </div>
 
-  createApp({
-    data() {
-      return {
-        message: 'Hello Vue!',
-        count: 0
+      <!-- total -->
+      <div>
+        TOTAL: ${{ total }}
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/vue@3/dist/vue.global.prod.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/quasar@2.10.0/dist/quasar.umd.prod.js"></script>
+    <script type="module">
+        
+      const App = {
+        setup () {
+          const startInputs = [
+            {
+              key: 'start-year',
+              label: 'Year',
+              min: 2016,
+              max: new Date().getFullYear(),
+            },
+            {
+              key: 'start-month',
+              label: 'Month',
+              min: 1,
+              max: 12
+            }
+          ]
+          const publicInputs = [
+            {
+              key: 'responsibility',
+              label: 'Responsibility Level',
+              min: 1,
+              max: 4,
+              step: 0.5,
+              color: 'deep-orange',
+            },
+            {
+              key: 'exec',
+              label: 'Exec percentage',
+              min: 0,
+              max: 100,
+              step: 5,
+              color: 'deep-orange',
+            },
+            {
+              key: 'hours',
+              label: 'Hours per week',
+              min: 0,
+              max: 40,
+              color: 'deep-orange',
+            }
+          ]
+
+          const privateInputs = [
+            {
+              key: 'disability',
+              label: 'Disability',
+              min: 0,
+              max: 10,
+              color: 'purple',
+            },
+            {
+              key: 'debt',
+              label: 'Debt',
+              min: 0,
+              max: 10,
+              color: 'purple',
+            },
+            {
+              key: 'disadvantage',
+              label: 'Disadvantage',
+              min: 0,
+              max: 10,
+              color: 'purple',
+            }
+          ]
+
+          const initialFormState = {}
+          ;[
+            ...startInputs,
+            ...publicInputs,
+            ...privateInputs
+          ].forEach(input => initialFormState[input.key] = input.min)
+
+          initialFormState.classification = 'employee'
+          initialFormState.hours = 40
+
+          const form = Vue.reactive(initialFormState)
+
+          const total = Vue.computed(() => {
+            const baseSalary = (
+              50000 +
+              form.responsibility * 10000 +
+              form.exec / 100 * 15000
+            )
+
+            return form.hours
+          })
+
+          return {
+            startInputs,
+            publicInputs,
+            privateInputs,
+            form,
+            total,
+
+            // helper methods
+            markerLabels: (input) => (val) => {
+              const largeStep = Math.ceil((input.max - input.min) / 5)
+              return {
+                label: (val - input.min) % largeStep === 0 ? val : ' '
+              }
+            },
+            inputRules: (input) => [
+              val => ('min' in input) && val >= input.min,
+              val => ('max' in input) && val <= input.max,
+              val => {
+                const step = input.step || 1
+                return Math.floor(val / step) * step === val
+              }
+            ]
+          }
+        },
+        // components: {
+        // }
       }
-    }
-  }).mount('#app')
-</script>
-</body>
+
+      const app = Vue.createApp(App)
+      app.use(Quasar)
+      app.mount('#app')
+    </script>
+  </body>
 
 </html>
