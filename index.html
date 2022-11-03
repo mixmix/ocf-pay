@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+
+<body>
+
+<div id="app">
+  {{ message }}
+
+  <div>
+    <button @click="count++" >
+      more
+    </button>
+    {{ count }}
+  </div>
+</div>
+
+<script type="module">
+  import { createApp } from 'https://unpkg.com/vue@3/dist/vue.esm-browser.js'
+
+  createApp({
+    data() {
+      return {
+        message: 'Hello Vue!',
+        count: 0
+      }
+    }
+  }).mount('#app')
+</script>
+</body>
+
+</html>
