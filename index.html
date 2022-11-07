@@ -20,7 +20,7 @@
         Started with company
       </label>
       <div class='row q-col-gutter-x-md q-ml-sm q-mb-lg'>
-        <div v-for="input in startInputs"
+        <div v-for="input in inputs.start"
           :key="input.key"
           class='col-3'
         >
@@ -41,7 +41,7 @@
 
       <!-- public + private -->
       <div
-        v-for="input in [...publicInputs, ...privateInputs]"
+        v-for="input in [...inputs.public, ...inputs.private]"
         :key="input.key"
       >
         <label>
@@ -87,7 +87,8 @@
         
       const App = {
         setup () {
-          const startInputs = [
+          const inputs = {
+            start: [
             {
               key: 'start-year',
               label: 'Year',
@@ -100,8 +101,8 @@
               min: 1,
               max: 12
             }
-          ]
-          const publicInputs = [
+          ],
+            public: [
             {
               key: 'responsibility',
               label: 'Responsibility Level',
@@ -125,9 +126,8 @@
               max: 40,
               color: 'deep-orange',
             }
-          ]
-
-          const privateInputs = [
+          ],
+          private: [
             {
               key: 'disability',
               label: 'Disability',
@@ -150,12 +150,13 @@
               color: 'purple',
             }
           ]
+          }
 
           const initialFormState = {}
           ;[
-            ...startInputs,
-            ...publicInputs,
-            ...privateInputs
+            ...inputs.start,
+            ...inputs.public,
+            ...inputs.private
           ].forEach(input => initialFormState[input.key] = input.min)
 
           initialFormState.classification = 'employee'
@@ -174,9 +175,7 @@
           })
 
           return {
-            startInputs,
-            publicInputs,
-            privateInputs,
+            inputs,
             form,
             total,
 
