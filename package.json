@@ -1,0 +1,24 @@
+{
+  "name": "open-collective-pay",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "serve public",
+    "lint": "standard --fix public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mixmix/open-collective-pay.git"
+  },
+  "author": "mixmix",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/mixmix/open-collective-pay/issues"
+  },
+  "homepage": "https://github.com/mixmix/open-collective-pay#readme",
+  "devDependencies": {
+    "serve": "^14.0.1",
+    "standard": "^17.0.0"
+  }
+}
