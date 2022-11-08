@@ -3,13 +3,13 @@ const { reactive, computed, createApp } = Vue // eslint-disable-line
 const inputs = {
   start: [
     {
-      key: 'start-year',
+      key: 'startYear',
       label: 'Year',
       min: 2016,
       max: new Date().getFullYear()
     },
     {
-      key: 'start-month',
+      key: 'startMonth',
       label: 'Month',
       min: 1,
       max: 12
@@ -88,21 +88,57 @@ function buildInitialFormState (inputs) {
 function setup () {
   const form = reactive(buildInitialFormState(inputs))
 
-  const total = computed(() => {
-    const baseSalary = (
-      50000 +
-            form.responsibility * 10000 +
-            form.exec / 100 * 15000
-    )
+  const fulltimeSalary = computed(() => (
+    50000 +
+    form.responsibility * 10000 +
+    form.exec / 100 * 15000
+  ))
 
-    // WIP
-    return baseSalary
+  const yearsOnTeam = computed(() => {
+    const timeOnTeam = new Date() - new Date(form.startYear, form.startMonth - 1, 1)
+    // - assumes started on first of month (generous)
+    // - NOTE Date creator counts months from zero!
+
+    return Math.floor(
+      timeOnTeam /
+      1000 / // milli-seconds per second
+      60 / // seconds per minute
+      60 / //  minutes per hour
+      24 / // hours per day
+      365.24 // days per year
+    )
   })
+
+  const effectiveDependants = computed(() => {
+    return form.dependants.reduce((acc, dependant) => {
+      return acc + 1 / dependant.supporters
+    }, 0)
+  })
+
+  const adjustment = computed(() => (
+    yearsOnTeam.value * 0.03 +
+    form.disability * 0.01 +
+    form.debt * 0.01 +
+    form.disadvantage * 0.01 +
+    effectiveDependants.value * 0.01
+  ))
+
+  const salary = computed(() => (
+    fulltimeSalary.value *
+    (1 + adjustment.value) *
+    form.hours / 40 // pro-rata
+  ))
 
   return {
     inputs,
     form,
-    total,
+
+    // getters
+    yearsOnTeam,
+    effectiveDependants,
+    adjustment,
+    fulltimeSalary,
+    salary,
 
     // helper methods
     markerLabels: (input) => (val) => {
@@ -118,7 +154,17 @@ function setup () {
         const step = input.step || 1
         return Math.floor(val / step) * step === val
       }
-    ]
+    ],
+    round: (val, DP = 2) => Math.round(val * 10 ** DP) / 10 ** DP, // round to 2DP
+
+    // actions
+    addDependant () {
+      const newDependant = form.dependants.length
+        ? { ...form.dependants[form.dependants.length - 1] } // copy last entry
+        : { supporters: 1 } // first entry
+
+      form.dependants.push(newDependant)
+    }
   }
 }
 

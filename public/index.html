@@ -19,7 +19,7 @@
       <label class='q-mb-lg'>
         Started with company
       </label>
-      <div class='row q-col-gutter-x-md q-ml-sm q-mb-lg'>
+      <div class='row q-col-gutter-x-md q-mt-sm q-ml-sm q-mb-lg'>
         <div v-for="input in inputs.start"
           :key="input.key"
           class='col-3'
@@ -53,6 +53,7 @@
             :color="input.color"
             markers
             :marker-labels="markerLabels(input)"
+            label-always
             :min="input.min"
             :max="input.max"
             :step="input.step || 1"
@@ -75,19 +76,47 @@
         </div>
       </div>
 
+      <!-- dependants -->
       <label>
-        Dependents
+        Dependants
       </label>
-
-      <div>
-        <ol>
-          <li
+      <div class="q-mt-xs q-ml-md">
+        <div class="row">
+          <q-btn
+            icon="person_add"
+            rounded
+            size="sm"
+            color="grey-7"
+            @click="addDependant"
+            class="col-1 q-mr-sm"
+          >
+          </q-btn>
+          <q-btn
+            icon="person_remove"
+            rounded
+            flat
+            size="sm"
+            color="grey-7"
+            :disabled="form.dependants.length === 0"
+            @click="form.dependants.pop()"
+            class="col-1"
+          >
+          </q-btn>
+        </div>
+        <div>
+          <div
             v-for="(dependant, i) in form.dependants"
             :key="i"
+            class="q-mt-sm"
           >
-            <span>
-              No. of people supporting:
-            </span>
+            <q-icon
+              name="person"
+              color="purple"
+              size="30px"
+              style="margin-left: 10px;"
+            >
+            </q-icon>
+            <span> supported by </span>
             <q-input
               type="number"
               v-model.number="dependant.supporters"
@@ -95,33 +124,56 @@
               :min="1"
               outlined
               dense
-              class="col-2"
+              style="display: inline-block; width: 60px"
             />
-          </li>
-        </ol>
+            </q-input>
+            <span> {{ dependant.supporters > 1 ? ' people' : ' person' }}.</span>
+          </div>
+        </div>
 
-        <q-btn
-          label="+"
-          @click="form.dependants.push({ supporters: 1 })"
-        >
-        </q-btn>
-
-        <q-btn
-          label="-"
-          @click="form.dependants.pop()"
-        >
-        </q-btn>
+        <div class="q-mt-sm text-subtitle2">
+          {{ `(${form.dependants.length} dependants, ${round(effectiveDependants)} effective dependants)` }}
+        </div>
       </div>
 
-      <!-- total -->
-      <div>
-        TOTAL: ${{ total }}
-      </div>
+        <!-- total -->
+      <q-card
+        flat
+        bordered
+        class="q-mt-lg"
+      >
+        <q-card-section>
+          <div>Full time salary: ${{ fulltimeSalary }}</div>
+          <div>Adjustment: +{{ Math.floor(adjustment * 100) }}%</div>
+        </q-card-section>
+
+        <q-card-section>
+          <span class="text-h6">
+            Salary: ${{ salary }}
+          <span>
+          <span class="text-body1">
+            (hourly: ${{ round(salary / 2080, 1) }})
+          </span>
+        </q-card-section>
+      </q-card>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/vue@3/dist/vue.global.prod.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/quasar@2.10.0/dist/quasar.umd.prod.js"></script>
     <script type="module" src="app.js"></script>
-  </body>
 
+    <style>
+      label {
+        font-size: 14px;
+        font-weight: 500;
+        color: #555;
+        color: #044f54;
+        letter-spacing: 1px;
+      }
+
+      .q-slider .q-slider__pin { display: none; }
+
+      .q-slider:active .q-slider__pin { display: initial; }
+    </style>
+  </body>
 </html>
