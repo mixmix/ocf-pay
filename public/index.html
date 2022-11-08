@@ -19,24 +19,33 @@
       <label class='q-mb-lg'>
         Started with company
       </label>
-      <div class='row q-col-gutter-x-md q-mt-sm q-ml-sm q-mb-lg'>
-        <div v-for="input in inputs.start"
-          :key="input.key"
-          class='col-3'
-        >
+      <div class='row q-col-gutter-x-md q-mt-sm q-ml-sm'>
+        <div class='col-3' >
           <q-input
             type="number"
-            v-model.number="form[input.key]"
-            :hint="input.label"
-            :step="input.step || 1"
-            :min="input.min"
-            :max="input.max"
-            :rules="inputRules(input)"
+            v-model.number="form.year"
+            step="1"
+            :min="inputs.year.min"
+            :max="inputs.year.max"
+            :rules="inputRules(inputs.year)"
             dense
             outlined
           />
           </q-input>
         </div>
+
+        <div class='col-4' >
+          <q-select
+            v-model="form.month"
+            :options="inputs.month.options"
+            dense
+            outlined
+          />
+          </q-input>
+        </div>
+      </div>
+      <div class='q-ml-lg q-mb-lg text-grey-8'>
+        {{ yearsOnTeam }} years on team
       </div>
 
       <!-- public + private -->
@@ -86,7 +95,7 @@
             icon="person_add"
             rounded
             size="sm"
-            color="grey-7"
+            color="purple"
             @click="addDependant"
             class="col-1 q-mr-sm"
           >
@@ -109,14 +118,10 @@
             :key="i"
             class="q-mt-sm"
           >
-            <q-icon
-              name="person"
-              color="purple"
-              size="30px"
-              style="margin-left: 10px;"
-            >
-            </q-icon>
-            <span> supported by </span>
+            <span class="text-weight-medium">
+              Dependant {{ i + 1 }}:
+            </span>
+            <span>supported by you and </span>
             <q-input
               type="number"
               v-model.number="dependant.supporters"
@@ -125,14 +130,17 @@
               outlined
               dense
               style="display: inline-block; width: 60px"
+              class="q-mx-xs"
             />
             </q-input>
-            <span> {{ dependant.supporters > 1 ? ' people' : ' person' }}.</span>
+            <span> other people.</span>
           </div>
         </div>
 
-        <div class="q-mt-sm text-subtitle2">
-          {{ `(${form.dependants.length} dependants, ${round(effectiveDependants)} effective dependants)` }}
+        <div class="q-mt-sm text-grey-8">
+          {{ form.dependants.length }} dependants,
+          <br />
+          {{ round(effectiveDependants) }} effective dependants
         </div>
       </div>
 
@@ -143,13 +151,19 @@
         class="q-mt-lg"
       >
         <q-card-section>
-          <div>Full time salary: ${{ fulltimeSalary }}</div>
-          <div>Adjustment: +{{ Math.floor(adjustment * 100) }}%</div>
+          <div><span class="text-weight-medium">Classification:</span> {{ form.classification }}</div>
+          <div><span class="text-weight-medium">Responsibility level:</span> {{ form.responsibility }}</div>
+          <div><span class="text-weight-medium">Years on team:</span> {{ yearsOnTeam }}</div>
+          <br />
+          <div><span class="text-weight-medium">FTE pay:</span> ${{ fulltimeSalary }}</div>
+          <div><span class="text-weight-medium">Hours per week:</span> {{ form.hours }}</div>
+
+          <!--<div>Adjustment: +{{ Math.floor(adjustment * 100) }}%</div>-->
         </q-card-section>
 
         <q-card-section>
           <span class="text-h6">
-            Salary: ${{ salary }}
+            Salary: ${{ round(salary, 0) }}
           <span>
           <span class="text-body1">
             (hourly: ${{ round(salary / 2080, 1) }})

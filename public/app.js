@@ -1,27 +1,36 @@
 const { reactive, computed, createApp } = Vue // eslint-disable-line
 
 const inputs = {
-  start: [
-    {
-      key: 'startYear',
-      label: 'Year',
-      min: 2016,
-      max: new Date().getFullYear()
-    },
-    {
-      key: 'startMonth',
-      label: 'Month',
-      min: 1,
-      max: 12
-    }
-  ],
+  year: {
+    key: 'year',
+    label: 'Year',
+    min: 2016,
+    max: new Date().getFullYear()
+  },
+  month: {
+    key: 'month',
+    label: 'Month',
+    options: [
+      'January',
+      'February',
+      'March',
+      'April',
+      'May',
+      'June',
+      'July',
+      'August',
+      'September',
+      'October',
+      'November',
+      'December'
+    ]
+  },
   public: [
     {
-      key: 'responsibility',
-      label: 'Responsibility Level',
-      min: 1,
-      max: 4,
-      step: 0.5,
+      key: 'hours',
+      label: 'Hours per week',
+      min: 0,
+      max: 40,
       color: 'deep-orange'
     },
     {
@@ -33,11 +42,12 @@ const inputs = {
       color: 'deep-orange'
     },
     {
-      key: 'hours',
-      label: 'Hours per week',
-      min: 0,
-      max: 40,
-      color: 'deep-orange'
+      key: 'responsibility',
+      label: 'Responsibility Level',
+      min: 1,
+      max: 4,
+      step: 0.5,
+      color: 'green'
     }
   ],
   private: [
@@ -67,13 +77,14 @@ const inputs = {
 
 function buildInitialFormState (inputs) {
   const initialFormState = {
+    year: inputs.year.max,
+    month: inputs.month.options[0],
     classification: 'employee',
     hours: 40,
     dependants: []
   }
 
   return [
-    ...inputs.start,
     ...inputs.public,
     ...inputs.private
   ].reduce(
@@ -95,7 +106,8 @@ function setup () {
   ))
 
   const yearsOnTeam = computed(() => {
-    const timeOnTeam = new Date() - new Date(form.startYear, form.startMonth - 1, 1)
+    const month = inputs.month.options.indexOf(form.month)
+    const timeOnTeam = new Date() - new Date(form.year, month, 1)
     // - assumes started on first of month (generous)
     // - NOTE Date creator counts months from zero!
 
@@ -116,6 +128,9 @@ function setup () {
   })
 
   const adjustment = computed(() => (
+    form.classification === 'contractor'
+      ? 0.10
+      : 0 +
     yearsOnTeam.value * 0.03 +
     form.disability * 0.01 +
     form.debt * 0.01 +
@@ -129,6 +144,7 @@ function setup () {
     form.hours / 40 // pro-rata
   ))
 
+  console.log(inputs.month.options)
   return {
     inputs,
     form,
