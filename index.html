@@ -75,6 +75,44 @@
         </div>
       </div>
 
+      <label>
+        Dependents
+      </label>
+
+      <div>
+        <ol>
+          <li
+            v-for="(dependant, i) in form.dependants"
+            :key="i"
+          >
+            <span>
+              No. of people supporting:
+            </span>
+            <q-input
+              type="number"
+              v-model.number="dependant.supporters"
+              :step="1"
+              :min="1"
+              outlined
+              dense
+              class="col-2"
+            />
+          </li>
+        </ol>
+
+        <q-btn
+          label="+"
+          @click="form.dependants.push({ supporters: 1 })"
+        >
+        </q-btn>
+
+        <q-btn
+          label="-"
+          @click="form.dependants.pop()"
+        >
+        </q-btn>
+      </div>
+
       <!-- total -->
       <div>
         TOTAL: ${{ total }}
