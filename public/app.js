@@ -123,19 +123,17 @@ function setup () {
 
   const effectiveDependants = computed(() => {
     return form.dependants.reduce((acc, dependant) => {
-      return acc + 1 / dependant.supporters
+      return acc + 1 / (dependant.supporters + 1)
     }, 0)
   })
 
   const adjustment = computed(() => (
-    form.classification === 'contractor'
-      ? 0.10
-      : 0 +
+    (form.classification === 'contractor' ? 0.10 : 0) +
     yearsOnTeam.value * 0.03 +
     form.disability * 0.01 +
     form.debt * 0.01 +
     form.disadvantage * 0.01 +
-    effectiveDependants.value * 0.01
+    effectiveDependants.value * 0.05
   ))
 
   const salary = computed(() => (
@@ -144,7 +142,6 @@ function setup () {
     form.hours / 40 // pro-rata
   ))
 
-  console.log(inputs.month.options)
   return {
     inputs,
     form,
